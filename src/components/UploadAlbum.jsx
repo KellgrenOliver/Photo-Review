@@ -4,15 +4,7 @@ import Alert from "react-bootstrap/Alert";
 import Form from "react-bootstrap/Form";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { v4 as uuidv4 } from "uuid";
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  setDoc,
-  doc,
-  updateDoc,
-} from "firebase/firestore";
+import { collection, query, where, setDoc, doc } from "firebase/firestore";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
@@ -158,7 +150,6 @@ const UploadAlbum = () => {
             url,
             uuid,
           });
-          console.log("KOMMER VI HIT");
 
           const collectionRef = doc(db, "albums", albumName);
 

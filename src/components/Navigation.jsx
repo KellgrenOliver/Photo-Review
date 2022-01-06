@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -31,17 +31,12 @@ const StyledLink = styled(Link)({
   color: "white",
   margin: "0 1rem 0 1rem",
   "&:hover": {
-    color: "white",
-    borderBottom: "3px solid gray",
-  },
-  "&.Active": {
-    borderBottom: "3px solid white",
+    color: "#76b582",
   },
 });
 
 const Navigation = () => {
   const { currentUser } = useAuthContext();
-  const [activeLink, setActiveLink] = useState();
 
   return (
     <Navbar bg="dark" variant="dark" expand="md" className="fixed-top">
@@ -49,9 +44,7 @@ const Navigation = () => {
         <Link to="/" className="navbar-brand">
           <LogoWrapper>
             <Icon icon={faLeaf} />
-            <BrandName onClick={() => setActiveLink("")}>
-              NATURE PHOTOS
-            </BrandName>
+            <BrandName>NATURE PHOTOS</BrandName>
           </LogoWrapper>
         </Link>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -59,68 +52,21 @@ const Navigation = () => {
           <Nav className="ms-auto">
             {currentUser ? (
               <>
-                <StyledLink
-                  to="/myprofile"
-                  onClick={() => setActiveLink("myprofile")}
-                  className={activeLink === "myprofile" && "Active"}
-                >
+                <StyledLink to="/myprofile">
                   {currentUser.displayName
                     ? currentUser.displayName.toUpperCase()
                     : currentUser.email.toUpperCase()}
                 </StyledLink>
-                <StyledLink
-                  onClick={() => setActiveLink("uploadalbum")}
-                  className={activeLink === "uploadalbum" && "Active"}
-                  id="uploadalbum"
-                  to="/uploadalbum"
-                >
-                  UPLOAD ALBUM
-                </StyledLink>
-                <StyledLink
-                  to="/albums"
-                  onClick={() => setActiveLink("albums")}
-                  className={activeLink === "albums" && "Active"}
-                >
-                  ALBUMS
-                </StyledLink>
-                <StyledLink
-                  to="/logout"
-                  onClick={() => setActiveLink("logout")}
-                  className={activeLink === "logout" && "Active"}
-                >
-                  LOG OUT
-                </StyledLink>
+                <StyledLink to="/uploadalbum">UPLOAD ALBUM</StyledLink>
+                <StyledLink to="/albums">ALBUMS</StyledLink>
+                <StyledLink to="/logout">LOG OUT</StyledLink>
               </>
             ) : (
               <>
-                <StyledLink
-                  to="/reviewalbum"
-                  onClick={() => setActiveLink("reviewalbum")}
-                  className={activeLink === "reviewalbum" && "Active"}
-                >
-                  REVIEW ALBUM
-                </StyledLink>
-                <StyledLink
-                  to="/photographs"
-                  onClick={() => setActiveLink("photographs")}
-                  className={activeLink === "photographs" && "Active"}
-                >
-                  PHOTOGRAPHS
-                </StyledLink>
-                <StyledLink
-                  to="/login"
-                  onClick={() => setActiveLink("login")}
-                  className={activeLink === "login" && "Active"}
-                >
-                  LOG IN
-                </StyledLink>
-                <StyledLink
-                  to="/signup"
-                  onClick={() => setActiveLink("signup")}
-                  className={activeLink === "signup" && "Active"}
-                >
-                  SIGN UP
-                </StyledLink>
+                <StyledLink to="/reviewalbum">REVIEW ALBUM</StyledLink>
+                <StyledLink to="/photographs">PHOTOGRAPHS</StyledLink>
+                <StyledLink to="/login">LOG IN</StyledLink>
+                <StyledLink to="/signup">SIGN UP</StyledLink>
               </>
             )}
           </Nav>

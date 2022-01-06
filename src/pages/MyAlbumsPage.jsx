@@ -33,11 +33,11 @@ const MyAlbumsPage = () => {
   const navigate = useNavigate();
 
   const queryRef = query(
-    collection(db, "photos"),
+    collection(db, "albums"),
     where("owner", "==", currentUser.uid)
   );
 
-  const { data } = useFirestoreQueryData(["photos"], queryRef);
+  const { data } = useFirestoreQueryData(["albums"], queryRef);
 
   const albumArr =
     data &&
