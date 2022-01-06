@@ -114,7 +114,6 @@ const UploadAlbum = () => {
       const uuid = uuidv4();
       const ext = image.name.substring(image.name.lastIndexOf(".") + 1 + 1);
       const fileRef = ref(storage, `albums/${albumName}/${uuid}.${ext}`);
-      let url = "";
 
       const uploadTask = uploadBytesResumable(fileRef, image);
 
@@ -139,8 +138,8 @@ const UploadAlbum = () => {
         },
         async () => {
           // get download url to uploaded file
-          url = await getDownloadURL(fileRef);
-          console.log(url);
+          const url = await getDownloadURL(fileRef);
+
           uploadImages.push({
             name: image.name,
             path: fileRef.fullPath,
@@ -152,14 +151,11 @@ const UploadAlbum = () => {
           });
 
           const collectionRef = doc(db, "albums", albumName);
-
           const docData = {
             owner: currentUser.uid,
             album: albumName,
             images: uploadImages,
           };
-
-          console.log(docData);
 
           await setDoc(collectionRef, docData);
         }

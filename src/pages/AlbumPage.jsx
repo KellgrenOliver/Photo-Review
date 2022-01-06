@@ -106,21 +106,16 @@ const AlbumPage = () => {
 
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
-  console.log(data);
-
   const submitAlbumName = async (e) => {
     e.preventDefault();
     const collectionRef = doc(db, "albums", newAlbumName);
-    console.log(params.id);
 
     const docData = {
       owner: currentUser.uid,
       album: newAlbumName,
       images: data[0].images,
     };
-    // await updateDoc(collectionRef, {
-    //   album: newAlbumName,
-    // });
+
     await setDoc(collectionRef, docData);
     await deleteDoc(doc(db, "albums", params.id));
   };
