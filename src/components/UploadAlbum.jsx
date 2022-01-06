@@ -4,7 +4,15 @@ import Alert from "react-bootstrap/Alert";
 import Form from "react-bootstrap/Form";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { v4 as uuidv4 } from "uuid";
-import { collection, addDoc, query, where } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  query,
+  where,
+  setDoc,
+  doc,
+  updateDoc,
+} from "firebase/firestore";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import { db, storage } from "../firebase";
@@ -83,10 +91,10 @@ const UploadAlbum = () => {
   };
 
   const queryRef = query(
-    collection(db, "photos"),
+    collection(db, "albums"),
     where("owner", "==", currentUser.uid)
   );
-  const { data } = useFirestoreQueryData(["photos"], queryRef);
+  const { data } = useFirestoreQueryData(["albums"], queryRef);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -107,19 +115,17 @@ const UploadAlbum = () => {
       return;
     }
 
-    images.forEach((image) => {
-      // generate a uuid for the file
+    const uploadImages = [];
+
+    for (let i = 0; i < images.length; i++) {
+      let image = images[i];
       const uuid = uuidv4();
-
-      // find file extension
       const ext = image.name.substring(image.name.lastIndexOf(".") + 1 + 1);
-      // create a reference to upload the file to
-      const fileRef = ref(storage, `photos/${uuid}.${ext}`);
+      const fileRef = ref(storage, `albums/${albumName}/${uuid}.${ext}`);
+      let url = "";
 
-      // upload image to fileRef
       const uploadTask = uploadBytesResumable(fileRef, image);
 
-      // attach upload observer
       uploadTask.on(
         "state_changed",
         (uploadTaskSnapshot) => {
@@ -141,31 +147,34 @@ const UploadAlbum = () => {
         },
         async () => {
           // get download url to uploaded file
-          const url = await getDownloadURL(fileRef);
-
-          // get reference to collection 'image'
-          const collectionRef = collection(db, `photos`);
-
-          // create document in db for the uploaded file
-          await addDoc(collectionRef, {
-            owner: currentUser.uid,
-            album: albumName,
-            name: image.name,
-            path: fileRef.fullPath,
-            size: image.size,
-            type: image.type,
-            ext,
-            url,
-            uuid,
-          });
-
-          setMessage({
-            type: "success",
-            msg: "Your photos was successfully uploaded.",
-          });
+          url = await getDownloadURL(fileRef);
+          console.log(url);
         }
       );
-    });
+      uploadImages.push({
+        name: image.name,
+        path: fileRef.fullPath,
+        size: image.size,
+        type: image.type,
+        ext,
+        url,
+        uuid,
+      });
+    }
+
+    console.log("KOMMER VI HIT");
+
+    const collectionRef = doc(db, "albums", albumName);
+
+    const docData = {
+      owner: currentUser.uid,
+      album: albumName,
+      images: uploadImages,
+    };
+
+    console.log(docData);
+
+    await setDoc(collectionRef, docData);
   };
 
   const handleReset = () => {
