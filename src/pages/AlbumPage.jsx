@@ -5,25 +5,16 @@ import {
   collection,
   query,
   where,
-  updateDoc,
+  deleteDoc,
   doc,
-  update,
+  setDoc,
 } from "firebase/firestore";
-import Form from "react-bootstrap/Form";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { db } from "../firebase";
 import Header from "../components/Header";
 import { useAuthContext } from "../contexts/AuthContext";
+import UpdateAlbum from "../components/UpdateAlbum";
 
-const Container = styled.div({
-  width: "85vw",
-  "@media screen and (min-width: 600px)": {
-    width: "40vw",
-  },
-  "@media screen and (min-width: 1024px)": {
-    width: "25vw",
-  },
-});
 const ImageWrapper = styled.div({
   width: "90vw",
   display: "flex",
@@ -88,35 +79,24 @@ const Button = styled.button({
   width: "100%",
   height: "50px",
 });
-const ButtonWrapper = styled.div({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "100%",
-  margin: "auto",
-});
-const UploadButton = styled.button({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  background: "linear-gradient(to right, #76b582, #368a46)",
-  color: "white",
-  borderRadius: "5px",
-  border: "none",
-  width: "100%",
-  height: "50px",
-  marginRight: "0.5rem",
-});
-const ResetButton = styled(UploadButton)({
-  background: "linear-gradient(to right, #ababab, #6e6e6e)",
-  marginLeft: "0.5rem",
-  marginRight: 0,
+const HighlightImageWrapper = styled.div(({ highlightImage }) => {
+  return {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: 0,
+    left: 0,
+    backgroundImage: `url(${highlightImage})`,
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+  };
 });
 
 const AlbumPage = () => {
   const params = useParams();
   const { currentUser } = useAuthContext();
   const [newAlbumName, setNewAlbumName] = useState("");
+  const [highlightImage, setHighlightImage] = useState("");
 
   const queryRef = query(
     collection(db, "albums"),
@@ -126,22 +106,28 @@ const AlbumPage = () => {
 
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
-  const collectionRef = doc(db, "albums", params.id);
-  console.log(params.id);
+  console.log(data);
 
   const submitAlbumName = async (e) => {
-    console.log(queryRef);
-    console.log(newAlbumName);
-    console.log(collectionRef);
     e.preventDefault();
-    await updateDoc(collectionRef, {
+    const collectionRef = doc(db, "albums", newAlbumName);
+    console.log(params.id);
+
+    const docData = {
+      owner: currentUser.uid,
       album: newAlbumName,
-    });
+      images: data[0].images,
+    };
+    // await updateDoc(collectionRef, {
+    //   album: newAlbumName,
+    // });
+    await setDoc(collectionRef, docData);
+    await deleteDoc(doc(db, "albums", params.id));
   };
 
   return (
     <>
-      <Header title={params.id.toUpperCase()} />
+      <Header title={data[0].album.toUpperCase()} />
       <form onSubmit={submitAlbumName}>
         <InputWrapper>
           <label>EDIT ALBUM NAME</label>
@@ -153,12 +139,35 @@ const AlbumPage = () => {
           <Button type="submit">SAVE</Button>
         </InputWrapper>
       </form>
+      <UpdateAlbum />
       <ImageWrapper>
         {data &&
           data[0].images.map((photo) => {
-            return <Img key={photo.uuid} src={photo.url} alt={photo.name} />;
+            return (
+              <Img
+                key={photo.uuid}
+                src={photo.url}
+                alt={photo.name}
+                onClick={() => setHighlightImage(photo.url)}
+              />
+            );
           })}
       </ImageWrapper>
+      {highlightImage.length > 0 && (
+        <HighlightImageWrapper highlightImage={highlightImage}>
+          <button
+            style={{
+              position: "absolute",
+              top: 73,
+              right: 12,
+              borderRadius: "50%",
+            }}
+            onClick={() => setHighlightImage("")}
+          >
+            X
+          </button>
+        </HighlightImageWrapper>
+      )}
     </>
   );
 };
