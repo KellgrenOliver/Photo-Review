@@ -149,32 +149,31 @@ const UploadAlbum = () => {
           // get download url to uploaded file
           url = await getDownloadURL(fileRef);
           console.log(url);
+          uploadImages.push({
+            name: image.name,
+            path: fileRef.fullPath,
+            size: image.size,
+            type: image.type,
+            ext,
+            url,
+            uuid,
+          });
+          console.log("KOMMER VI HIT");
+
+          const collectionRef = doc(db, "albums", albumName);
+
+          const docData = {
+            owner: currentUser.uid,
+            album: albumName,
+            images: uploadImages,
+          };
+
+          console.log(docData);
+
+          await setDoc(collectionRef, docData);
         }
       );
-      uploadImages.push({
-        name: image.name,
-        path: fileRef.fullPath,
-        size: image.size,
-        type: image.type,
-        ext,
-        url,
-        uuid,
-      });
     }
-
-    console.log("KOMMER VI HIT");
-
-    const collectionRef = doc(db, "albums", albumName);
-
-    const docData = {
-      owner: currentUser.uid,
-      album: albumName,
-      images: uploadImages,
-    };
-
-    console.log(docData);
-
-    await setDoc(collectionRef, docData);
   };
 
   const handleReset = () => {
