@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { useParams } from "react-router-dom";
 import {
@@ -15,7 +15,7 @@ import Header from "../components/Header";
 import { useAuthContext } from "../contexts/AuthContext";
 import UpdateAlbum from "../components/UpdateAlbum";
 
-const ImageWrapper = styled.div({
+const ImageContainer = styled.div({
   width: "90vw",
   display: "flex",
   justifyContent: "center",
@@ -91,12 +91,39 @@ const HighlightImageWrapper = styled.div(({ highlightImage }) => {
     backgroundSize: "cover",
   };
 });
+const ImageWrapper = styled.div({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+});
+const Checkbox = styled.input({
+  margin: "0 1rem 1rem 1rem",
+  width: "25px",
+  height: "25px",
+});
+const UpdateAlbumWrapper = styled.div({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  marginBottom: "5rem",
+});
+const NewAlbumForm = styled.form({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+});
 
 const AlbumPage = () => {
   const params = useParams();
   const { currentUser } = useAuthContext();
+  const [updateAlbumName, setUpdateAlbumName] = useState("");
   const [newAlbumName, setNewAlbumName] = useState("");
   const [highlightImage, setHighlightImage] = useState("");
+  const [newAlbum, setNewAlbum] = useState([]);
+
+  console.log(newAlbum);
 
   const queryRef = query(
     collection(db, "albums"),
@@ -108,11 +135,12 @@ const AlbumPage = () => {
 
   const submitAlbumName = async (e) => {
     e.preventDefault();
-    const collectionRef = doc(db, "albums", newAlbumName);
+    const collectionRef = doc(db, "albums", updateAlbumName);
 
     const docData = {
       owner: currentUser.uid,
-      album: newAlbumName,
+      album: updateAlbumName,
+      albumId: data[0].albumId,
       images: data[0].images,
     };
 
@@ -120,34 +148,69 @@ const AlbumPage = () => {
     await deleteDoc(doc(db, "albums", params.id));
   };
 
+  const handleNewAlbum = async (e) => {
+    e.preventDefault();
+
+    let albumId = Math.random().toString(36).slice(2);
+
+    const hejRef = doc(db, "albums", newAlbumName);
+    const hejData = {
+      owner: currentUser.uid,
+      albumId: albumId,
+      album: newAlbumName,
+      images: newAlbum,
+    };
+
+    await setDoc(hejRef, hejData);
+  };
+
   return (
     <>
-      <Header title={data[0].album.toUpperCase()} />
+      <Header title={data && data[0].album.toUpperCase()} />
       <form onSubmit={submitAlbumName}>
         <InputWrapper>
           <label>EDIT ALBUM NAME</label>
           <Input
             type="text"
-            value={newAlbumName}
-            onChange={(e) => setNewAlbumName(e.target.value)}
+            value={updateAlbumName}
+            onChange={(e) => setUpdateAlbumName(e.target.value)}
           />
           <Button type="submit">SAVE</Button>
         </InputWrapper>
       </form>
-      <UpdateAlbum />
-      <ImageWrapper>
-        {data &&
+      <UpdateAlbumWrapper>
+        <UpdateAlbum />
+      </UpdateAlbumWrapper>
+      <ImageContainer>
+        {data[0].images &&
           data[0].images.map((photo) => {
             return (
-              <Img
-                key={photo.uuid}
-                src={photo.url}
-                alt={photo.name}
-                onClick={() => setHighlightImage(photo.url)}
-              />
+              <ImageWrapper key={photo.uuid}>
+                <Img
+                  src={photo.url}
+                  alt={photo.name}
+                  onClick={() => setHighlightImage(photo.url)}
+                />
+                <Checkbox
+                  type="checkbox"
+                  onClick={() => {
+                    newAlbum.push(photo);
+                  }}
+                />
+              </ImageWrapper>
             );
           })}
-      </ImageWrapper>
+      </ImageContainer>
+      <NewAlbumForm onSubmit={handleNewAlbum}>
+        <label>NAME OF THE NEW ALBUM</label>
+        <input
+          type="text"
+          required={true}
+          value={newAlbumName}
+          onChange={(e) => setNewAlbumName(e.target.value)}
+        />
+        <button type="submit">Create</button>
+      </NewAlbumForm>
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>
           <button

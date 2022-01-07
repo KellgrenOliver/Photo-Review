@@ -114,6 +114,7 @@ const UploadAlbum = () => {
       const uuid = uuidv4();
       const ext = image.name.substring(image.name.lastIndexOf(".") + 1 + 1);
       const fileRef = ref(storage, `albums/${albumName}/${uuid}.${ext}`);
+      let albumId = Math.random().toString(36).slice(2);
 
       const uploadTask = uploadBytesResumable(fileRef, image);
 
@@ -153,6 +154,7 @@ const UploadAlbum = () => {
           const collectionRef = doc(db, "albums", albumName);
           const docData = {
             owner: currentUser.uid,
+            albumId: albumId,
             album: albumName,
             images: uploadImages,
           };
