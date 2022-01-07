@@ -13,7 +13,7 @@ const Container = styled.div({
   alignItems: "center",
   flexWrap: "wrap",
 });
-const AlbumWrapper = styled.div({
+const Album = styled.div({
   width: "250px",
   height: "150px",
   background: "linear-gradient(to right, #76b582, #368a46)",
@@ -56,9 +56,9 @@ const MyAlbumsPage = () => {
         {Arr &&
           Arr.map((album, i) => {
             return (
-              <AlbumWrapper onClick={() => navigate(album)} key={i}>
+              <Album onClick={() => navigate(album)} key={i}>
                 <h5>{album.toUpperCase()}</h5>
-              </AlbumWrapper>
+              </Album>
             );
           })}
       </Container>
