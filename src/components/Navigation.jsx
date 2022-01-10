@@ -24,14 +24,22 @@ const BrandName = styled.span({
   fontWeight: 200,
 });
 const StyledLink = styled(Link)({
-  fontSize: "1.2rem",
+  fontSize: "1rem",
   fontWeight: 200,
   borderBottom: "3px solid transparent",
   textDecoration: "none",
   color: "white",
-  margin: "0 1rem 0 1rem",
+  margin: "0.5rem 0 0.5rem 0",
   "&:hover": {
     color: "#76b582",
+  },
+  "@media screen and (min-width: 600px)": {
+    margin: "0 0.5rem 0 0.5rem",
+    fontSize: "0.8rem",
+  },
+  "@media screen and (min-width: 1024px)": {
+    margin: "0 1rem 0 1rem",
+    fontSize: "1.2rem",
   },
 });
 

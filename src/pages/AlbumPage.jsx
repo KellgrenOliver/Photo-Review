@@ -82,11 +82,17 @@ const Button = styled.button({
 });
 const HighlightImageWrapper = styled.div(({ highlightImage }) => {
   return {
+    padding: "5rem",
     position: "absolute",
-    width: "100%",
-    height: "100%",
+    width: "100vw",
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "auto",
     top: 0,
     left: 0,
+    right: 0,
     backgroundImage: `url(${highlightImage})`,
     backgroundPosition: "center",
     backgroundSize: "cover",
@@ -116,6 +122,16 @@ const NewAlbumForm = styled.form({
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "column",
+});
+const CloseX = styled.div({
+  position: "absolute",
+  top: 70,
+  right: 20,
+  borderRadius: "50%",
+  cursor: "pointer",
+  color: "white",
+  fontWeight: "bold",
+  fontSize: "2rem",
 });
 
 const AlbumPage = () => {
@@ -222,6 +238,7 @@ const AlbumPage = () => {
                   type="checkbox"
                   onClick={() => {
                     newAlbum.push(photo);
+                    console.log(newAlbum);
                   }}
                 />
               </ImageWrapper>
@@ -242,18 +259,11 @@ const AlbumPage = () => {
         </InputWrapper>
       </NewAlbumForm>
       {highlightImage.length > 0 && (
-        <HighlightImageWrapper highlightImage={highlightImage}>
-          <button
-            style={{
-              position: "absolute",
-              top: 73,
-              right: 12,
-              borderRadius: "50%",
-            }}
-            onClick={() => setHighlightImage("")}
-          >
-            X
-          </button>
+        <HighlightImageWrapper
+          highlightImage={highlightImage}
+          onClick={window.scrollTo(0, 0)}
+        >
+          <CloseX onClick={() => setHighlightImage("")}>X</CloseX>
         </HighlightImageWrapper>
       )}
     </>
