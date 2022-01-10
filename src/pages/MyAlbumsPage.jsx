@@ -68,8 +68,6 @@ const MyAlbumsPage = () => {
     albumArr &&
     albumArr.filter((value, index, array) => array.indexOf(value) === index);
 
-  console.log(data);
-
   return (
     <>
       <Header title={"ALBUMS"} />

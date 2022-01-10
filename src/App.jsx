@@ -13,6 +13,8 @@ import UploadAlbumPage from "./pages/UploadAlbumPage";
 import MyAlbumsPage from "./pages/MyAlbumsPage";
 import AlbumPage from "./pages/AlbumPage";
 import ReviewAlbumPage from "./pages/ReviewAlbumPage";
+import MyReviwedAlbumsPage from "./pages/MyReviwedAlbumsPage";
+import ReviwedAlbumPage from "./pages/ReviwedAlbumPage";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,6 +47,16 @@ const App = () => {
                 exact
                 path="/reviewalbums/:id"
                 element={<ReviewAlbumPage />}
+              />
+              <Route
+                exact
+                path="/reviewedalbums"
+                element={<MyReviwedAlbumsPage />}
+              />
+              <Route
+                exact
+                path="/reviewedalbums/:id"
+                element={<ReviwedAlbumPage />}
               />
             </Routes>
           </AuthContextProvider>

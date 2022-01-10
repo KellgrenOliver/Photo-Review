@@ -47,8 +47,6 @@ const useUploadPhoto = () => {
         );
       },
       (e) => {
-        console.log("NOT so great success, fail!", e);
-
         setError(
           `Image failed to upload due to the following error: ${e.message}`
         );

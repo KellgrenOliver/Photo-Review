@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import styled from "@emotion/styled";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
+import Header from "../components/Header";
 
 const Container = styled.div({
   textAlign: "center",
@@ -49,16 +50,6 @@ const Button = styled.button({
     backgroundColor: "#187580",
   },
 });
-const H1 = styled.h1({
-  fontSize: "2rem",
-  fontWeight: 200,
-  "@media screen and (min-width: 600px)": {
-    fontSize: "4rem",
-  },
-  "@media screen and (min-width: 1024px)": {
-    fontSize: "5rem",
-  },
-});
 const SignUpLink = styled(Link)({
   cursor: "pointer",
   textDecoration: "none",
@@ -89,7 +80,7 @@ const LoginPage = () => {
 
   return (
     <Container>
-      <H1>LOG IN</H1>
+      <Header title={"LOG IN "} />
       {error && <h2>{error}</h2>}
       <form onSubmit={handleSubmit}>
         <Wrapper>

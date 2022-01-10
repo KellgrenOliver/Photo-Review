@@ -95,8 +95,6 @@ const UpdateAlbum = () => {
           );
         },
         (e) => {
-          console.log("NOT so great success, fail!", e);
-
           setMessage({
             type: "warning",
             msg: `Image failed to upload due to the following error: ${e.message}`,
@@ -105,7 +103,6 @@ const UpdateAlbum = () => {
         async () => {
           // get download url to uploaded file
           url = await getDownloadURL(fileRef);
-          console.log(url);
           uploadImages.push({
             name: image.name,
             path: fileRef.fullPath,

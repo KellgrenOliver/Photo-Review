@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import styled from "@emotion/styled";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthContext } from "../contexts/AuthContext";
+import Header from "../components/Header";
 
 const Container = styled.div({
   display: "flex",
@@ -9,7 +10,6 @@ const Container = styled.div({
   alignItems: "center",
   flexDirection: "column",
   textAlign: "center",
-  marginTop: "10vh",
   "@media screen and (min-width: 600px)": {
     marginTop: "25vh",
   },
@@ -48,16 +48,6 @@ const Button = styled.button({
     backgroundColor: "#187580",
   },
 });
-const H1 = styled.h1({
-  fontSize: "2rem",
-  fontWeight: 200,
-  "@media screen and (min-width: 600px)": {
-    fontSize: "4rem",
-  },
-  "@media screen and (min-width: 1024px)": {
-    fontSize: "5rem",
-  },
-});
 const LogInLink = styled(Link)({
   cursor: "pointer",
   textDecoration: "none",
@@ -94,7 +84,7 @@ const SignupPage = () => {
 
   return (
     <Container>
-      <H1>SIGN UP</H1>
+      <Header title={"SIGN UP"} />
       {error && <h2>{error}</h2>}
       <form onSubmit={handleSubmit}>
         <div>

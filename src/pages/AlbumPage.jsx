@@ -140,8 +140,6 @@ const AlbumPage = () => {
   const { data } = useFirestoreQueryData(["albums"], queryRef);
   const { data: albumData } = useFirestoreQueryData(["albums"], albumRef);
 
-  console.log(albumData && albumData[0].album);
-
   const submitAlbumName = async (e) => {
     e.preventDefault();
 
@@ -174,15 +172,16 @@ const AlbumPage = () => {
 
     let albumId = Math.random().toString(36).slice(2);
 
-    const hejRef = doc(db, "albums", newAlbumName);
-    const hejData = {
+    const collectionRef = doc(db, "albums", newAlbumName);
+    const docData = {
       owner: currentUser.uid,
       albumId: albumId,
       album: newAlbumName,
       images: newAlbum,
+      review: false,
     };
 
-    await setDoc(hejRef, hejData);
+    await setDoc(collectionRef, docData);
 
     setMessage({
       type: "success",

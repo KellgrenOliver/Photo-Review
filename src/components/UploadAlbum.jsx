@@ -155,6 +155,7 @@ const UploadAlbum = () => {
             albumId: albumId,
             album: albumName,
             images: uploadImages,
+            review: false,
           };
 
           await setDoc(collectionRef, docData);
