@@ -39,7 +39,7 @@ const StyledLink = styled(Link)({
   },
   "@media screen and (min-width: 1024px)": {
     margin: "0 1rem 0 1rem",
-    fontSize: "1.2rem",
+    fontSize: "1rem",
   },
 });
 
