@@ -102,7 +102,7 @@ const UploadAlbum = () => {
     if (albums.includes(albumName)) {
       setMessage({
         type: "warning",
-        msg: "Album already exists!",
+        msg: "Album already exists.",
       });
       return;
     }
@@ -130,8 +130,6 @@ const UploadAlbum = () => {
           );
         },
         (e) => {
-          console.log("NOT so great success, fail!", e);
-
           setMessage({
             type: "warning",
             msg: `Image failed to upload due to the following error: ${e.message}`,
@@ -160,6 +158,11 @@ const UploadAlbum = () => {
           };
 
           await setDoc(collectionRef, docData);
+
+          setMessage({
+            type: "success",
+            msg: "Album was successfully created.",
+          });
         }
       );
     }

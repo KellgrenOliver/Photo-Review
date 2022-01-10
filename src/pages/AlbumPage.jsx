@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { useParams } from "react-router-dom";
 import {
@@ -14,6 +14,7 @@ import { db } from "../firebase";
 import Header from "../components/Header";
 import { useAuthContext } from "../contexts/AuthContext";
 import UpdateAlbum from "../components/UpdateAlbum";
+import Alert from "react-bootstrap/Alert";
 
 const ImageContainer = styled.div({
   width: "90vw",
@@ -101,11 +102,13 @@ const Checkbox = styled.input({
   margin: "0 1rem 1rem 1rem",
   width: "25px",
   height: "25px",
+  cursor: "pointer",
 });
 const UpdateAlbumWrapper = styled.div({
   display: "flex",
   justifyContent: "center",
   alignItems: "center",
+  flexDirection: "column",
   marginBottom: "5rem",
 });
 const NewAlbumForm = styled.form({
@@ -122,19 +125,27 @@ const AlbumPage = () => {
   const [newAlbumName, setNewAlbumName] = useState("");
   const [highlightImage, setHighlightImage] = useState("");
   const [newAlbum, setNewAlbum] = useState([]);
-
-  console.log(newAlbum);
+  const [message, setMessage] = useState();
 
   const queryRef = query(
     collection(db, "albums"),
     where("album", "==", params.id),
     where("owner", "==", currentUser.uid)
   );
+  const albumRef = query(
+    collection(db, "albums"),
+    where("owner", "==", currentUser.uid)
+  );
 
   const { data } = useFirestoreQueryData(["albums"], queryRef);
+  const { data: albumData } = useFirestoreQueryData(["albums"], albumRef);
+
+  console.log(albumData && albumData[0].album);
 
   const submitAlbumName = async (e) => {
     e.preventDefault();
+
+    setNewAlbum(newAlbum);
     const collectionRef = doc(db, "albums", updateAlbumName);
 
     const docData = {
@@ -151,6 +162,16 @@ const AlbumPage = () => {
   const handleNewAlbum = async (e) => {
     e.preventDefault();
 
+    const albums = albumData && albumData[0].images.map((item) => item.album);
+
+    if (albums.includes(newAlbumName)) {
+      setMessage({
+        type: "warning",
+        msg: "Album already exists.",
+      });
+      return;
+    }
+
     let albumId = Math.random().toString(36).slice(2);
 
     const hejRef = doc(db, "albums", newAlbumName);
@@ -162,6 +183,11 @@ const AlbumPage = () => {
     };
 
     await setDoc(hejRef, hejData);
+
+    setMessage({
+      type: "success",
+      msg: "Album was successfully created.",
+    });
   };
 
   return (
@@ -179,10 +205,12 @@ const AlbumPage = () => {
         </InputWrapper>
       </form>
       <UpdateAlbumWrapper>
+        <label>ADD PHOTOS</label>
         <UpdateAlbum />
       </UpdateAlbumWrapper>
       <ImageContainer>
-        {data[0].images &&
+        {data &&
+          data[0].images &&
           data[0].images.map((photo) => {
             return (
               <ImageWrapper key={photo.uuid}>
@@ -201,15 +229,18 @@ const AlbumPage = () => {
             );
           })}
       </ImageContainer>
+      {message && <Alert variant={message.type}>{message.msg}</Alert>}
       <NewAlbumForm onSubmit={handleNewAlbum}>
-        <label>NAME OF THE NEW ALBUM</label>
-        <input
-          type="text"
-          required={true}
-          value={newAlbumName}
-          onChange={(e) => setNewAlbumName(e.target.value)}
-        />
-        <button type="submit">Create</button>
+        <InputWrapper>
+          <label>NAME OF THE NEW ALBUM</label>
+          <Input
+            type="text"
+            required={true}
+            value={newAlbumName}
+            onChange={(e) => setNewAlbumName(e.target.value)}
+          />
+          <Button type="submit">CREATE</Button>
+        </InputWrapper>
       </NewAlbumForm>
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>

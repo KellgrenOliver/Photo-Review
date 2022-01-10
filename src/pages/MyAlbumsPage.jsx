@@ -6,6 +6,7 @@ import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
+import { Link } from "react-router-dom";
 
 const Container = styled.div({
   display: "flex",
@@ -26,6 +27,24 @@ const Album = styled.div({
   borderRadius: "5px",
   padding: "20px",
   textAlign: "center",
+});
+const AlbumLink = styled(Link)({
+  width: "250px",
+  height: "50px",
+  background: "linear-gradient(to right, #76b582, #368a46)",
+  textDecoration: "none",
+  color: "white",
+  margin: "0 2rem 2rem 2rem",
+  cursor: "pointer",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  borderRadius: "5px",
+  padding: "20px",
+  textAlign: "center",
+  "&:hover": {
+    color: "white",
+  },
 });
 
 const MyAlbumsPage = () => {
@@ -49,18 +68,28 @@ const MyAlbumsPage = () => {
     albumArr &&
     albumArr.filter((value, index, array) => array.indexOf(value) === index);
 
+  console.log(data);
+
   return (
     <>
       <Header title={"ALBUMS"} />
       <Container>
-        {Arr &&
-          Arr.map((album, i) => {
-            return (
-              <Album onClick={() => navigate(album)} key={i}>
-                <h5>{album.toUpperCase()}</h5>
-              </Album>
-            );
-          })}
+        {data && data.length > 0 ? (
+          <>
+            {Arr &&
+              Arr.map((album, i) => {
+                return (
+                  <Album onClick={() => navigate(album)} key={i}>
+                    <h5>{album.toUpperCase()}</h5>
+                  </Album>
+                );
+              })}
+          </>
+        ) : (
+          <>
+            <AlbumLink to="/uploadalbum">UPLOAD ALBUM</AlbumLink>
+          </>
+        )}
       </Container>
     </>
   );

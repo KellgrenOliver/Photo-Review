@@ -63,8 +63,6 @@ const Navigation = () => {
               </>
             ) : (
               <>
-                <StyledLink to="/reviewalbums">REVIEW ALBUMS</StyledLink>
-                <StyledLink to="/photographs">PHOTOGRAPHS</StyledLink>
                 <StyledLink to="/login">LOG IN</StyledLink>
                 <StyledLink to="/signup">SIGN UP</StyledLink>
               </>

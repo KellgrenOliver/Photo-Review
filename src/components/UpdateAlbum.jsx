@@ -123,6 +123,11 @@ const UpdateAlbum = () => {
           };
 
           await updateDoc(collectionRef, docData);
+
+          setMessage({
+            type: "success",
+            msg: "Images was successfully uploaded.",
+          });
         }
       );
     }
