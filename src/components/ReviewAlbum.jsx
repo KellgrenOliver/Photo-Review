@@ -60,11 +60,40 @@ const Button = styled.button({
   width: "100%",
   height: "50px",
 });
+const HighlightImageWrapper = styled.div(({ highlightImage }) => {
+  return {
+    padding: "5rem",
+    position: "fixed",
+    width: "100vw",
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "auto",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundImage: `url(${highlightImage})`,
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+  };
+});
+const CloseX = styled.div({
+  position: "absolute",
+  top: 70,
+  right: 20,
+  borderRadius: "50%",
+  cursor: "pointer",
+  color: "white",
+  fontWeight: "bold",
+  fontSize: "2rem",
+});
 
 const ReviewAlbum = () => {
   const [reviewedAlbum, setReviewedAlbum] = useState([]);
   const params = useParams();
   const [message, setMessage] = useState();
+  const [highlightImage, setHighlightImage] = useState("");
 
   const queryRef = query(
     collection(db, "albums"),
@@ -104,7 +133,11 @@ const ReviewAlbum = () => {
             {data[0].images.map((photo) => {
               return (
                 <ImageWrapper key={photo.uuid}>
-                  <Img src={photo.url} alt={photo.name} />
+                  <Img
+                    src={photo.url}
+                    alt={photo.name}
+                    onClick={() => setHighlightImage(photo.url)}
+                  />
                   <IconWrapper>
                     <Icon
                       icon={faThumbsUp}
@@ -125,6 +158,11 @@ const ReviewAlbum = () => {
           </>
         )}
       </ImageContainer>
+      {highlightImage.length > 0 && (
+        <HighlightImageWrapper highlightImage={highlightImage}>
+          <CloseX onClick={() => setHighlightImage("")}>X</CloseX>
+        </HighlightImageWrapper>
+      )}
       {message && <Alert variant={message.type}>{message.msg}</Alert>}
       <form onSubmit={handleReviewedAlbum}>
         <Button type="submit">SAVE</Button>

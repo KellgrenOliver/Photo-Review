@@ -83,7 +83,7 @@ const Button = styled.button({
 const HighlightImageWrapper = styled.div(({ highlightImage }) => {
   return {
     padding: "5rem",
-    position: "absolute",
+    position: "fixed",
     width: "100vw",
     height: "100vh",
     display: "flex",
@@ -159,7 +159,6 @@ const AlbumPage = () => {
   const submitAlbumName = async (e) => {
     e.preventDefault();
 
-    setNewAlbum(newAlbum);
     const collectionRef = doc(db, "albums", updateAlbumName);
 
     const docData = {
@@ -175,6 +174,14 @@ const AlbumPage = () => {
 
   const handleNewAlbum = async (e) => {
     e.preventDefault();
+
+    if (newAlbum.length === 0) {
+      setMessage({
+        type: "warning",
+        msg: "Please add at least one photo to your album.",
+      });
+      return;
+    }
 
     const albums = albumData && albumData[0].images.map((item) => item.album);
 
@@ -203,6 +210,17 @@ const AlbumPage = () => {
       type: "success",
       msg: "Album was successfully created.",
     });
+  };
+
+  const changeCheckbox = (checked, photo) => {
+    if (checked) {
+      setNewAlbum([...newAlbum, photo]);
+    } else {
+      const album = newAlbum.filter(function (obj) {
+        return obj.uuid !== photo.uuid;
+      });
+      setNewAlbum(album);
+    }
   };
 
   return (
@@ -236,10 +254,8 @@ const AlbumPage = () => {
                 />
                 <Checkbox
                   type="checkbox"
-                  onClick={() => {
-                    newAlbum.push(photo);
-                    console.log(newAlbum);
-                  }}
+                  defaultValue={false}
+                  onChange={(e) => changeCheckbox(e.target.checked, photo)}
                 />
               </ImageWrapper>
             );
@@ -259,10 +275,7 @@ const AlbumPage = () => {
         </InputWrapper>
       </NewAlbumForm>
       {highlightImage.length > 0 && (
-        <HighlightImageWrapper
-          highlightImage={highlightImage}
-          onClick={window.scrollTo(0, 0)}
-        >
+        <HighlightImageWrapper highlightImage={highlightImage}>
           <CloseX onClick={() => setHighlightImage("")}>X</CloseX>
         </HighlightImageWrapper>
       )}
