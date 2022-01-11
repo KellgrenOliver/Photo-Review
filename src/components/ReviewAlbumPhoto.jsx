@@ -33,7 +33,7 @@ const IconWrapper = styled.div({
   flexDirection: "row",
 });
 const Icon = styled(FontAwesomeIcon)({
-  fontSize: "3rem",
+  fontSize: "2rem",
   margin: "0 1rem 1rem 1rem",
   cursor: "pointer",
   opacity: "0.3",

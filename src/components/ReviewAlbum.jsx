@@ -50,21 +50,22 @@ const Icon = styled(FontAwesomeIcon)({
   margin: "0 1rem 1rem 1rem",
   cursor: "pointer",
   opacity: "0.3",
-  "&.liked": {
+  "&.reviewed": {
     color: "gray",
     opacity: 1,
   },
 });
 const Button = styled.button({
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
   background: "linear-gradient(to right, #76b582, #368a46)",
-  color: "white",
+  width: "100px",
+  height: "35px",
   borderRadius: "5px",
+  color: "white",
+  textAlign: "center",
   border: "none",
-  width: "100%",
-  height: "50px",
+  marginBottom: "1rem",
+  marginTop: "1rem",
+  cursor: "pointer",
 });
 const HighlightImageWrapper = styled.div(({ highlightImage }) => {
   return {
@@ -116,8 +117,6 @@ const ReviewAlbum = () => {
   const params = useParams();
   const [message, setMessage] = useState();
   const [highlightImage, setHighlightImage] = useState("");
-  const [isLiked, setIsLiked] = useState();
-  const [isDisLiked, setIsDisLiked] = useState();
 
   const queryRef = query(
     collection(db, "albums"),
@@ -166,8 +165,6 @@ const ReviewAlbum = () => {
     const filteredAlbum = removedPhotos.filter(function (obj) {
       return obj.uuid !== photo.uuid;
     });
-    setIsLiked(photo.uuid);
-    setIsDisLiked(false);
     setRemovedPhotos(filteredAlbum);
   };
 
@@ -175,8 +172,6 @@ const ReviewAlbum = () => {
     const filteredAlbum = reviewedAlbum.filter(function (obj) {
       return obj.uuid !== photo.uuid;
     });
-    setIsDisLiked(photo.uuid);
-    setIsLiked(false);
     setRemovedPhotos([...removedPhotos, photo]);
     setReviewedAlbum(filteredAlbum);
   };
@@ -188,32 +183,39 @@ const ReviewAlbum = () => {
           <>
             {data[0].images.map((photo) => {
               return (
-                // <ImageWrapper key={photo.uuid}>
-                //   <Img
-                //     src={photo.url}
-                //     alt={photo.name}
-                //     onClick={() => {
-                //       setHighlightImage(photo.url);
-                //     }}
-                //   />
-                //   <IconWrapper>
-                //     <Icon
-                //       className={isLiked === photo.uuid && "liked"}
-                //       icon={faThumbsUp}
-                //       onClick={() => {
-                //         addPhotoToGallery(photo);
-                //       }}
-                //     />
-                //     <Icon
-                //       className={isDisLiked === photo.uuid && "liked"}
-                //       icon={faThumbsDown}
-                //       onClick={() => {
-                //         removePhotoFromGallery(photo);
-                //       }}
-                //     />
-                //   </IconWrapper>
-                // </ImageWrapper>
-                <ReviewAlbumPhoto photo={photo} key={photo.uuid} />
+                <ImageWrapper key={photo.uuid}>
+                  <Img
+                    src={photo.url}
+                    alt={photo.name}
+                    onClick={() => {
+                      setHighlightImage(photo.url);
+                    }}
+                  />
+                  <IconWrapper>
+                    <Icon
+                      className={
+                        reviewedAlbum.some((p) => p.uuid === photo.uuid) &&
+                        "reviewed"
+                      }
+                      icon={faThumbsUp}
+                      onClick={() => {
+                        !reviewedAlbum.some((p) => p.uuid === photo.uuid) &&
+                          addPhotoToGallery(photo);
+                      }}
+                    />
+                    <Icon
+                      className={
+                        removedPhotos.some((p) => p.uuid === photo.uuid) &&
+                        "reviewed"
+                      }
+                      icon={faThumbsDown}
+                      onClick={() => {
+                        !removedPhotos.some((p) => p.uuid === photo.uuid) &&
+                          removePhotoFromGallery(photo);
+                      }}
+                    />
+                  </IconWrapper>
+                </ImageWrapper>
               );
             })}
           </>

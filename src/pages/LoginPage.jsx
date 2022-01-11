@@ -46,9 +46,6 @@ const Button = styled.button({
   border: "none",
   marginBottom: "1rem",
   cursor: "pointer",
-  "&:hover": {
-    backgroundColor: "#187580",
-  },
 });
 const SignUpLink = styled(Link)({
   cursor: "pointer",
