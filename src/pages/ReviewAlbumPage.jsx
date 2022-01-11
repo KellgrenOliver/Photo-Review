@@ -16,7 +16,7 @@ const ReviewAlbumPage = () => {
   const { data } = useFirestoreQueryData(["albums"], queryRef);
   return (
     <div>
-      <Header title={data && data[0].album} />
+      <Header title={data && data[0].album.toUpperCase()} />
       <ReviewAlbum />
     </div>
   );

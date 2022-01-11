@@ -53,36 +53,22 @@ const MyAlbumsPage = () => {
 
   const queryRef = query(
     collection(db, "albums"),
-    where("owner", "==", currentUser.uid)
+    where("owner", "==", currentUser.uid),
+    where("review", "==", false)
   );
 
   const { data } = useFirestoreQueryData(["albums"], queryRef);
-
-  const albumArr =
-    data &&
-    data.map((album) => {
-      return album.album;
-    });
-
-  let Arr =
-    albumArr &&
-    albumArr.filter((value, index, array) => array.indexOf(value) === index);
 
   return (
     <>
       <Header title={"ALBUMS"} />
       <Container>
         {data && data.length > 0 ? (
-          <>
-            {Arr &&
-              Arr.map((album, i) => {
-                return (
-                  <Album onClick={() => navigate(album)} key={i}>
-                    <h5>{album.toUpperCase()}</h5>
-                  </Album>
-                );
-              })}
-          </>
+          data.map((album) => (
+            <Album onClick={() => navigate(album.album)} key={album.albumId}>
+              {album.album.toUpperCase()}
+            </Album>
+          ))
         ) : (
           <>
             <AlbumLink to="/uploadalbum">UPLOAD ALBUM</AlbumLink>

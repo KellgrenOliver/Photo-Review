@@ -55,6 +55,9 @@ const InputWrapper = styled.div({
     width: "25vw",
   },
 });
+const LinkWrapper = styled(InputWrapper)({
+  flexDirection: "row",
+});
 const Input = styled.input({
   backgroundColor: "#dedede",
   width: "100%",
@@ -115,7 +118,7 @@ const UpdateAlbumWrapper = styled.div({
   justifyContent: "center",
   alignItems: "center",
   flexDirection: "column",
-  marginBottom: "5rem",
+  marginBottom: "3rem",
 });
 const NewAlbumForm = styled.form({
   display: "flex",
@@ -133,6 +136,26 @@ const CloseX = styled.div({
   fontWeight: "bold",
   fontSize: "2rem",
 });
+const LinkToReviewBox = styled.div({
+  height: "50px",
+  backgroundColor: "#dedede",
+  borderRadius: "0 5px 5px 0",
+  width: "100%",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  padding: "0.7rem",
+  fontSize: "0.7rem",
+});
+const Label = styled.label({
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  margin: "auto",
+});
+const CopyButton = styled(Button)({
+  borderRadius: "5px 0 0 5px",
+});
 
 const AlbumPage = () => {
   const params = useParams();
@@ -146,15 +169,19 @@ const AlbumPage = () => {
   const queryRef = query(
     collection(db, "albums"),
     where("album", "==", params.id),
-    where("owner", "==", currentUser.uid)
+    where("owner", "==", currentUser.uid),
+    where("review", "==", false)
   );
   const albumRef = query(
     collection(db, "albums"),
-    where("owner", "==", currentUser.uid)
+    where("owner", "==", currentUser.uid),
+    where("review", "==", false)
   );
 
   const { data } = useFirestoreQueryData(["albums"], queryRef);
   const { data: albumData } = useFirestoreQueryData(["albums"], albumRef);
+
+  console.log(data);
 
   const submitAlbumName = async (e) => {
     e.preventDefault();
@@ -223,6 +250,12 @@ const AlbumPage = () => {
     }
   };
 
+  const link = `www.localhost:3000/reviewalbum/${data && data[0].albumId}`;
+
+  const copy = async () => {
+    await navigator.clipboard.writeText(link);
+  };
+
   return (
     <>
       <Header title={data && data[0].album.toUpperCase()} />
@@ -241,6 +274,13 @@ const AlbumPage = () => {
         <label>ADD PHOTOS</label>
         <UpdateAlbum />
       </UpdateAlbumWrapper>
+      <Label>LINK TO CUSTOMER</Label>
+      <LinkWrapper>
+        <CopyButton onClick={copy}>COPY</CopyButton>
+        <LinkToReviewBox>
+          <span>{link}</span>
+        </LinkToReviewBox>
+      </LinkWrapper>
       <ImageContainer>
         {data &&
           data[0].images &&

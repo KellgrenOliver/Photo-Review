@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { useParams } from "react-router-dom";
 import { collection, query, where, doc, setDoc } from "firebase/firestore";
@@ -7,6 +7,7 @@ import { db } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 import Alert from "react-bootstrap/Alert";
+import ReviewAlbumPhoto from "./ReviewAlbumPhoto";
 
 const ImageContainer = styled.div({
   width: "90vw",
@@ -48,6 +49,11 @@ const Icon = styled(FontAwesomeIcon)({
   fontSize: "3rem",
   margin: "0 1rem 1rem 1rem",
   cursor: "pointer",
+  opacity: "0.3",
+  "&.liked": {
+    color: "gray",
+    opacity: 1,
+  },
 });
 const Button = styled.button({
   display: "flex",
@@ -88,12 +94,30 @@ const CloseX = styled.div({
   fontWeight: "bold",
   fontSize: "2rem",
 });
+const SaveWrapper = styled.div({
+  margin: "auto",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
+  flexDirection: "column",
+  marginBottom: "3rem",
+  width: "85vw",
+  "@media screen and (min-width: 600px)": {
+    width: "40vw",
+  },
+  "@media screen and (min-width: 1024px)": {
+    width: "25vw",
+  },
+});
 
 const ReviewAlbum = () => {
   const [reviewedAlbum, setReviewedAlbum] = useState([]);
+  const [removedPhotos, setRemovedPhotos] = useState([]);
   const params = useParams();
   const [message, setMessage] = useState();
   const [highlightImage, setHighlightImage] = useState("");
+  const [isLiked, setIsLiked] = useState();
+  const [isDisLiked, setIsDisLiked] = useState();
 
   const queryRef = query(
     collection(db, "albums"),
@@ -104,7 +128,14 @@ const ReviewAlbum = () => {
 
   const handleReviewedAlbum = async (e) => {
     e.preventDefault();
-    setReviewedAlbum(reviewedAlbum);
+
+    if (data[0].images.length !== reviewedAlbum.length + removedPhotos.length) {
+      setMessage({
+        type: "warning",
+        msg: "Please review all images.",
+      });
+      return;
+    }
 
     let albumId = Math.random().toString(36).slice(2);
 
@@ -125,6 +156,31 @@ const ReviewAlbum = () => {
     });
   };
 
+  useEffect(() => {
+    console.log({ removedPhotos });
+    console.log({ reviewedAlbum });
+  }, [removedPhotos, reviewedAlbum]);
+
+  const addPhotoToGallery = (photo) => {
+    setReviewedAlbum([...reviewedAlbum, photo]);
+    const filteredAlbum = removedPhotos.filter(function (obj) {
+      return obj.uuid !== photo.uuid;
+    });
+    setIsLiked(photo.uuid);
+    setIsDisLiked(false);
+    setRemovedPhotos(filteredAlbum);
+  };
+
+  const removePhotoFromGallery = (photo) => {
+    const filteredAlbum = reviewedAlbum.filter(function (obj) {
+      return obj.uuid !== photo.uuid;
+    });
+    setIsDisLiked(photo.uuid);
+    setIsLiked(false);
+    setRemovedPhotos([...removedPhotos, photo]);
+    setReviewedAlbum(filteredAlbum);
+  };
+
   return (
     <>
       <ImageContainer>
@@ -132,41 +188,48 @@ const ReviewAlbum = () => {
           <>
             {data[0].images.map((photo) => {
               return (
-                <ImageWrapper key={photo.uuid}>
-                  <Img
-                    src={photo.url}
-                    alt={photo.name}
-                    onClick={() => setHighlightImage(photo.url)}
-                  />
-                  <IconWrapper>
-                    <Icon
-                      icon={faThumbsUp}
-                      onClick={() => {
-                        reviewedAlbum.push(photo);
-                      }}
-                    />
-                    <Icon
-                      icon={faThumbsDown}
-                      onClick={() => {
-                        reviewedAlbum.shift(photo);
-                      }}
-                    />
-                  </IconWrapper>
-                </ImageWrapper>
+                // <ImageWrapper key={photo.uuid}>
+                //   <Img
+                //     src={photo.url}
+                //     alt={photo.name}
+                //     onClick={() => {
+                //       setHighlightImage(photo.url);
+                //     }}
+                //   />
+                //   <IconWrapper>
+                //     <Icon
+                //       className={isLiked === photo.uuid && "liked"}
+                //       icon={faThumbsUp}
+                //       onClick={() => {
+                //         addPhotoToGallery(photo);
+                //       }}
+                //     />
+                //     <Icon
+                //       className={isDisLiked === photo.uuid && "liked"}
+                //       icon={faThumbsDown}
+                //       onClick={() => {
+                //         removePhotoFromGallery(photo);
+                //       }}
+                //     />
+                //   </IconWrapper>
+                // </ImageWrapper>
+                <ReviewAlbumPhoto photo={photo} key={photo.uuid} />
               );
             })}
           </>
         )}
       </ImageContainer>
+      <SaveWrapper>
+        {message && <Alert variant={message.type}>{message.msg}</Alert>}
+        <form onSubmit={handleReviewedAlbum}>
+          <Button type="submit">SAVE</Button>
+        </form>
+      </SaveWrapper>
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>
           <CloseX onClick={() => setHighlightImage("")}>X</CloseX>
         </HighlightImageWrapper>
       )}
-      {message && <Alert variant={message.type}>{message.msg}</Alert>}
-      <form onSubmit={handleReviewedAlbum}>
-        <Button type="submit">SAVE</Button>
-      </form>
     </>
   );
 };

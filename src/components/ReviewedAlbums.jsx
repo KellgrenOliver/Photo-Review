@@ -44,7 +44,7 @@ const ReviewedAlbums = () => {
       {data &&
         data.map((album) => (
           <Album key={album.albumId} onClick={() => navigate(album.album)}>
-            {album.album}
+            {album.album.toUpperCase()}
           </Album>
         ))}
     </Container>

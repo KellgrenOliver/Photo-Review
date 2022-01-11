@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "@emotion/styled";
 import { collection, query, where } from "firebase/firestore";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
@@ -30,9 +30,38 @@ const Img = styled.img({
     width: "400px",
   },
 });
+const HighlightImageWrapper = styled.div(({ highlightImage }) => {
+  return {
+    padding: "5rem",
+    position: "fixed",
+    width: "100vw",
+    height: "100vh",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    margin: "auto",
+    top: 0,
+    left: 0,
+    right: 0,
+    backgroundImage: `url(${highlightImage})`,
+    backgroundPosition: "center",
+    backgroundSize: "cover",
+  };
+});
+const CloseX = styled.div({
+  position: "absolute",
+  top: 70,
+  right: 20,
+  borderRadius: "50%",
+  cursor: "pointer",
+  color: "white",
+  fontWeight: "bold",
+  fontSize: "2rem",
+});
 
 const ReviewedAlbum = () => {
   const { currentUser } = useAuthContext();
+  const [highlightImage, setHighlightImage] = useState("");
   const params = useParams();
 
   const queryRef = query(
@@ -45,12 +74,24 @@ const ReviewedAlbum = () => {
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
   return (
-    <ImageContainer>
-      {data &&
-        data[0].images.map((photo) => (
-          <Img key={photo.uuid} src={photo.url} alt={photo.name} />
-        ))}
-    </ImageContainer>
+    <>
+      <ImageContainer>
+        {data &&
+          data[0].images.map((photo) => (
+            <Img
+              key={photo.uuid}
+              src={photo.url}
+              alt={photo.name}
+              onClick={() => setHighlightImage(photo.url)}
+            />
+          ))}
+      </ImageContainer>
+      {highlightImage.length > 0 && (
+        <HighlightImageWrapper highlightImage={highlightImage}>
+          <CloseX onClick={() => setHighlightImage("")}>X</CloseX>
+        </HighlightImageWrapper>
+      )}
+    </>
   );
 };
 

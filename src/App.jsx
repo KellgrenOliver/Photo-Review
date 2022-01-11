@@ -45,7 +45,7 @@ const App = () => {
               <Route exact path="/uploadalbum" element={<UploadAlbumPage />} />
               <Route
                 exact
-                path="/reviewalbums/:id"
+                path="/reviewalbum/:id"
                 element={<ReviewAlbumPage />}
               />
               <Route
