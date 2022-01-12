@@ -8,6 +8,7 @@ import {
   deleteDoc,
   doc,
   setDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import { useFirestoreQueryData } from "@react-query-firebase/firestore";
 import { db } from "../firebase";
@@ -162,6 +163,7 @@ const AlbumPage = () => {
   const { currentUser } = useAuthContext();
   const [updateAlbumName, setUpdateAlbumName] = useState("");
   const [newAlbumName, setNewAlbumName] = useState("");
+  const [albumValue, setAlbumValue] = useState("");
   const [highlightImage, setHighlightImage] = useState("");
   const [newAlbum, setNewAlbum] = useState([]);
   const [message, setMessage] = useState();
@@ -181,11 +183,10 @@ const AlbumPage = () => {
   const { data } = useFirestoreQueryData(["albums"], queryRef);
   const { data: albumData } = useFirestoreQueryData(["albums"], albumRef);
 
-  console.log(data);
-
   const submitAlbumName = async (e) => {
+    console.log(albumValue);
+    setNewAlbumName(albumValue);
     e.preventDefault();
-
     const collectionRef = doc(db, "albums", updateAlbumName);
 
     const docData = {
@@ -193,6 +194,7 @@ const AlbumPage = () => {
       album: updateAlbumName,
       albumId: data[0].albumId,
       images: data[0].images,
+      review: false,
     };
 
     await setDoc(collectionRef, docData);
@@ -265,7 +267,9 @@ const AlbumPage = () => {
           <Input
             type="text"
             value={updateAlbumName}
+            required={true}
             onChange={(e) => setUpdateAlbumName(e.target.value)}
+            // onChange={(e) => setAlbumValue(e.target.value)}
           />
           <Button type="submit">SAVE</Button>
         </InputWrapper>
