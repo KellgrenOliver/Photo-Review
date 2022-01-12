@@ -63,28 +63,31 @@ const MyProfilePage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    // If password and confirm password not matches
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
-      return setError("The passwords does not match");
+      return setError("The passwords does not match.");
     }
 
     try {
       setLoading(true);
-
+      // If displayname isnt is as the new one the setDisplayName function sets new displayname on user
       if (displayNameRef.current.value !== currentUser.displayName) {
         await setDisplayName(displayNameRef.current.value);
       }
 
+      // If email isnt is as the new one the setEmail function sets new email on user
       if (emailRef.current.value !== currentUser.email) {
         await setEmail(emailRef.current.value);
       }
 
+      // If password isnt is as the new one the setPassword sets new password on user
       if (passwordRef.current.value) {
         await setPassword(passwordRef.current.value);
       }
       setMessage("Profile successfully updated");
       setLoading(false);
     } catch (e) {
+      // If there is any problem it catches error
       setError("Error updating profile. Please try logging out and in again.");
       setLoading(false);
     }

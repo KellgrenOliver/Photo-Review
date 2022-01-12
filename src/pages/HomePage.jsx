@@ -3,17 +3,22 @@ import styled from "@emotion/styled";
 import HomePageCarousel from "../components/HomePageCarousel";
 
 const TextWrapper = styled.div({
-  width: "70vw",
+  width: "90vw",
   fontSize: "1.2rem",
   margin: "auto",
   marginTop: "2rem",
   marginBottom: "2rem",
+  "@media screen and (min-width: 600px)": {
+    width: "70vw",
+  },
 });
 
 const HomePage = () => {
   return (
     <>
+      {/* Carousel */}
       <HomePageCarousel />
+      {/* Text */}
       <TextWrapper>
         <p>
           Nature photography is a wide range of photography taken outdoors and

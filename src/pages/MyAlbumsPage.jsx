@@ -63,11 +63,14 @@ const MyAlbumsPage = () => {
     <>
       <Header title={"ALBUMS"} />
       <Container>
+        {/* Maping out data if there is any, if not this page shows a link to upload album page */}
         {data && data.length > 0 ? (
           data.map((album) => (
-            <Album onClick={() => navigate(album.album)} key={album.albumId}>
-              {album.album.toUpperCase()}
-            </Album>
+            <div key={album.albumId}>
+              <Album onClick={() => navigate(album.albumId)}>
+                {album.album.toUpperCase()}
+              </Album>
+            </div>
           ))
         ) : (
           <>

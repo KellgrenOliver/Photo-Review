@@ -7,7 +7,6 @@ import { db } from "../firebase";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faThumbsUp, faThumbsDown } from "@fortawesome/free-solid-svg-icons";
 import Alert from "react-bootstrap/Alert";
-import ReviewAlbumPhoto from "./ReviewAlbumPhoto";
 
 const ImageContainer = styled.div({
   width: "90vw",
@@ -19,8 +18,8 @@ const ImageContainer = styled.div({
 });
 const Img = styled.img({
   margin: "0 0.5rem 1rem 0.5rem",
-  height: "100px",
-  width: "150px",
+  height: "200px",
+  width: "300px",
   borderRadius: "5px",
   cursor: "pointer",
   "@media screen and (min-width: 600px)": {
@@ -46,7 +45,7 @@ const IconWrapper = styled.div({
   flexDirection: "row",
 });
 const Icon = styled(FontAwesomeIcon)({
-  fontSize: "3rem",
+  fontSize: "1.5rem",
   margin: "0 1rem 1rem 1rem",
   cursor: "pointer",
   opacity: "0.3",
@@ -80,6 +79,7 @@ const HighlightImageWrapper = styled.div(({ highlightImage }) => {
     top: 0,
     left: 0,
     right: 0,
+    // Gets highlightImage through props
     backgroundImage: `url(${highlightImage})`,
     backgroundPosition: "center",
     backgroundSize: "cover",
@@ -118,16 +118,19 @@ const ReviewAlbum = () => {
   const [message, setMessage] = useState();
   const [highlightImage, setHighlightImage] = useState("");
 
+  // Reference to db
   const queryRef = query(
     collection(db, "albums"),
     where("albumId", "==", params.id)
   );
 
+  // Gets data from React Query Firebase
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
   const handleReviewedAlbum = async (e) => {
     e.preventDefault();
 
+    // If all images isnt reviewed
     if (data[0].images.length !== reviewedAlbum.length + removedPhotos.length) {
       setMessage({
         type: "warning",
@@ -136,9 +139,11 @@ const ReviewAlbum = () => {
       return;
     }
 
+    // Creates random id
     let albumId = Math.random().toString(36).slice(2);
 
     const collectionRef = doc(db, "albums", `Reviewed album: ${data[0].album}`);
+    // Sets data to object
     const docData = {
       owner: data[0].owner,
       albumId: albumId,
@@ -155,13 +160,13 @@ const ReviewAlbum = () => {
     });
   };
 
-  useEffect(() => {
-    console.log({ removedPhotos });
-    console.log({ reviewedAlbum });
-  }, [removedPhotos, reviewedAlbum]);
+  // UseEffect that are listening to removedPohots and reviewAlbum
+  useEffect(() => {}, [removedPhotos, reviewedAlbum]);
 
   const addPhotoToGallery = (photo) => {
+    // Takes a copy of array and adding photo to the array
     setReviewedAlbum([...reviewedAlbum, photo]);
+    // Not adding photo to array if the photo already exist in array
     const filteredAlbum = removedPhotos.filter(function (obj) {
       return obj.uuid !== photo.uuid;
     });
@@ -179,6 +184,7 @@ const ReviewAlbum = () => {
   return (
     <>
       <ImageContainer>
+        {/* Maping out images from the album */}
         {data && (
           <>
             {data[0].images.map((photo) => {
@@ -187,6 +193,7 @@ const ReviewAlbum = () => {
                   <Img
                     src={photo.url}
                     alt={photo.name}
+                    // Sets hightlightImage to the url of the photo
                     onClick={() => {
                       setHighlightImage(photo.url);
                     }}
@@ -222,11 +229,13 @@ const ReviewAlbum = () => {
         )}
       </ImageContainer>
       <SaveWrapper>
+        {/* Messages */}
         {message && <Alert variant={message.type}>{message.msg}</Alert>}
         <form onSubmit={handleReviewedAlbum}>
           <Button type="submit">SAVE</Button>
         </form>
       </SaveWrapper>
+      {/* Show big image */}
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>
           <CloseX onClick={() => setHighlightImage("")}>X</CloseX>

@@ -17,6 +17,7 @@ const H1 = styled.h1({
 const Header = (props) => {
   return (
     <>
+      {/* Reuseable header component with props */}
       <H1>{props.title}</H1>
     </>
   );

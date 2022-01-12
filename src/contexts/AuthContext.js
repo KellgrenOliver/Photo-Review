@@ -27,6 +27,7 @@ const useAuthContext = () => {
 };
 
 const AuthContextProverder = (props) => {
+  // Creates states
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -54,6 +55,7 @@ const AuthContextProverder = (props) => {
     });
   };
 
+  // UseEffect that sets the current user to the logged in user
   useEffect(() => {
     onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);

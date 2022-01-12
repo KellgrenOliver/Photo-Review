@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { useParams } from "react-router-dom";
 import {
@@ -146,7 +146,7 @@ const LinkToReviewBox = styled.div({
   justifyContent: "center",
   alignItems: "center",
   padding: "0.7rem",
-  fontSize: "0.7rem",
+  fontSize: "0.5rem",
 });
 const Label = styled.label({
   display: "flex",
@@ -163,47 +163,66 @@ const AlbumPage = () => {
   const { currentUser } = useAuthContext();
   const [updateAlbumName, setUpdateAlbumName] = useState("");
   const [newAlbumName, setNewAlbumName] = useState("");
-  const [albumValue, setAlbumValue] = useState("");
   const [highlightImage, setHighlightImage] = useState("");
   const [newAlbum, setNewAlbum] = useState([]);
   const [message, setMessage] = useState();
+  const [album, setAlbum] = useState();
 
+  // Gets reference to db to get specific album from user
   const queryRef = query(
     collection(db, "albums"),
-    where("album", "==", params.id),
-    where("owner", "==", currentUser.uid),
-    where("review", "==", false)
+    where("review", "==", false),
+    where("albumId", "==", params.id),
+    where("owner", "==", currentUser.uid)
   );
+  // Gets reference to db to get all albums from user
   const albumRef = query(
     collection(db, "albums"),
-    where("owner", "==", currentUser.uid),
-    where("review", "==", false)
+    where("review", "==", false),
+    where("owner", "==", currentUser.uid)
   );
 
-  const { data } = useFirestoreQueryData(["albums"], queryRef);
+  let { data } = useFirestoreQueryData(["albums"], queryRef);
   const { data: albumData } = useFirestoreQueryData(["albums"], albumRef);
 
-  const submitAlbumName = async (e) => {
-    console.log(albumValue);
-    setNewAlbumName(albumValue);
-    e.preventDefault();
-    const collectionRef = doc(db, "albums", updateAlbumName);
+  // Maps albums to a const
+  const albums = albumData && albumData[0].images.map((item) => item.album);
 
+  useEffect(() => {
+    // Onsnapshot function to get live data
+    onSnapshot(queryRef, (snapshot) => {
+      data = [];
+      snapshot.docs.forEach((doc) => {
+        data.push({ ...doc.data(), id: doc.id });
+      });
+      setAlbum(data);
+    });
+  }, []);
+
+  const submitAlbumName = async (e) => {
+    e.preventDefault();
+    setUpdateAlbumName(updateAlbumName);
+
+    setUpdateAlbumName("");
+    const collectionRef = doc(db, "albums", updateAlbumName);
+    // Sets data to the new album
     const docData = {
       owner: currentUser.uid,
       album: updateAlbumName,
-      albumId: data[0].albumId,
-      images: data[0].images,
+      albumId: album[0].albumId,
+      images: album[0].images,
       review: false,
     };
-
+    // Creats new album with new albumname
     await setDoc(collectionRef, docData);
-    await deleteDoc(doc(db, "albums", params.id));
+    // Deletes album with the old albumname
+    await deleteDoc(doc(db, "albums", album && album[0].album));
   };
 
   const handleNewAlbum = async (e) => {
     e.preventDefault();
 
+    // If there isnt any images selected
     if (newAlbum.length === 0) {
       setMessage({
         type: "warning",
@@ -211,9 +230,7 @@ const AlbumPage = () => {
       });
       return;
     }
-
-    const albums = albumData && albumData[0].images.map((item) => item.album);
-
+    // If the new album name already exists
     if (albums.includes(newAlbumName)) {
       setMessage({
         type: "warning",
@@ -221,10 +238,11 @@ const AlbumPage = () => {
       });
       return;
     }
-
+    // Creats a random id
     let albumId = Math.random().toString(36).slice(2);
 
     const collectionRef = doc(db, "albums", newAlbumName);
+    // Sets data to the new album
     const docData = {
       owner: currentUser.uid,
       albumId: albumId,
@@ -232,7 +250,7 @@ const AlbumPage = () => {
       images: newAlbum,
       review: false,
     };
-
+    // Creats new album
     await setDoc(collectionRef, docData);
 
     setMessage({
@@ -240,11 +258,13 @@ const AlbumPage = () => {
       msg: "Album was successfully created.",
     });
   };
-
+  // Checkbox takes checked and photo as props
   const changeCheckbox = (checked, photo) => {
     if (checked) {
+      // Takes copy of array and adds photo
       setNewAlbum([...newAlbum, photo]);
     } else {
+      // Filtering newAlbum
       const album = newAlbum.filter(function (obj) {
         return obj.uuid !== photo.uuid;
       });
@@ -252,15 +272,16 @@ const AlbumPage = () => {
     }
   };
 
-  const link = `www.localhost:3000/reviewalbum/${data && data[0].albumId}`;
-
+  const link = `www.localhost:3000/reviewalbum/${params.id}`;
+  // Copy function
   const copy = async () => {
     await navigator.clipboard.writeText(link);
   };
 
   return (
     <>
-      <Header title={data && data[0].album.toUpperCase()} />
+      <Header title={album && album[0].album.toUpperCase()} />
+      {/* Edit album name form */}
       <form onSubmit={submitAlbumName}>
         <InputWrapper>
           <label>EDIT ALBUM NAME</label>
@@ -269,26 +290,28 @@ const AlbumPage = () => {
             value={updateAlbumName}
             required={true}
             onChange={(e) => setUpdateAlbumName(e.target.value)}
-            // onChange={(e) => setAlbumValue(e.target.value)}
           />
           <Button type="submit">SAVE</Button>
         </InputWrapper>
       </form>
+      {/* Add photos to album */}
       <UpdateAlbumWrapper>
         <label>ADD PHOTOS</label>
         <UpdateAlbum />
       </UpdateAlbumWrapper>
       <Label>LINK TO CUSTOMER</Label>
+      {/* Copy link to customer */}
       <LinkWrapper>
         <CopyButton onClick={copy}>COPY</CopyButton>
         <LinkToReviewBox>
           <span>{link}</span>
         </LinkToReviewBox>
       </LinkWrapper>
+      {/* Maps out images */}
       <ImageContainer>
-        {data &&
-          data[0].images &&
-          data[0].images.map((photo) => {
+        {album &&
+          album[0].images &&
+          album[0].images.map((photo) => {
             return (
               <ImageWrapper key={photo.uuid}>
                 <Img
@@ -305,8 +328,9 @@ const AlbumPage = () => {
             );
           })}
       </ImageContainer>
-      {message && <Alert variant={message.type}>{message.msg}</Alert>}
+      {/* Create a new album from the existing album */}
       <NewAlbumForm onSubmit={handleNewAlbum}>
+        {message && <Alert variant={message.type}>{message.msg}</Alert>}
         <InputWrapper>
           <label>NAME OF THE NEW ALBUM</label>
           <Input
@@ -318,6 +342,7 @@ const AlbumPage = () => {
           <Button type="submit">CREATE</Button>
         </InputWrapper>
       </NewAlbumForm>
+      {/* Big image */}
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>
           <CloseX onClick={() => setHighlightImage("")}>X</CloseX>

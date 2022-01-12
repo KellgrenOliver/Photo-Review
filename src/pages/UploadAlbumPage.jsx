@@ -15,6 +15,7 @@ const UploadAlbumPage = () => {
   return (
     <Container>
       <Header title={"UPLOAD ALBUM"} />
+      {/* Render upload album component */}
       <UploadAlbum />
     </Container>
   );

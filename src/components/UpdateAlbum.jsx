@@ -52,14 +52,16 @@ const UpdateAlbum = () => {
   const [uploadProgress, setUploadProgress] = useState(null);
   const { currentUser } = useAuthContext();
 
+  // Gets the files that are selected
   const handleFileChange = (e) => {
     setImages([...e.target.files]);
   };
 
   const queryRef = query(
     collection(db, "albums"),
+    where("review", "==", false),
     where("owner", "==", currentUser.uid),
-    where("album", "==", params.id)
+    where("albumId", "==", params.id)
   );
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
@@ -68,21 +70,27 @@ const UpdateAlbum = () => {
 
     setUploadProgress(null);
 
+    // If there isnt any images its gonna end here
     if (!images) {
       return;
     }
 
+    // Creates array of the files that are gonna be uploaded
     const uploadImages = [];
 
+    // Looping through the images
     for (let i = 0; i < images.length; i++) {
       let image = images[i];
+      // Creats a unique id
       const uuid = uuidv4();
+      // File extension
       const ext = image.name.substring(image.name.lastIndexOf(".") + 1 + 1);
+      // Creates a reference to upload the file to storage
       const fileRef = ref(storage, `albums/${params.id}/${uuid}.${ext}`);
-      let url = "";
-
+      //Uploading the image to reference
       const uploadTask = uploadBytesResumable(fileRef, image);
 
+      // Observer
       uploadTask.on(
         "state_changed",
         (uploadTaskSnapshot) => {
@@ -101,8 +109,8 @@ const UpdateAlbum = () => {
           });
         },
         async () => {
-          // get download url to uploaded file
-          url = await getDownloadURL(fileRef);
+          // Gets the download url to the uploaded file
+          const url = await getDownloadURL(fileRef);
           uploadImages.push({
             name: image.name,
             path: fileRef.fullPath,
@@ -113,12 +121,12 @@ const UpdateAlbum = () => {
             uuid,
           });
 
-          const collectionRef = doc(db, "albums", params.id);
-
+          const collectionRef = doc(db, "albums", data && data[0].album);
+          // Sets the new data
           const docData = {
-            images: uploadImages.concat(data[0].images),
+            images: uploadImages.concat(data && data[0].images),
           };
-
+          // Updating document
           await updateDoc(collectionRef, docData);
 
           setMessage({
@@ -129,7 +137,7 @@ const UpdateAlbum = () => {
       );
     }
   };
-
+  // Removes the selceted files
   const handleReset = () => {
     setImages(null);
     setMessage(null);

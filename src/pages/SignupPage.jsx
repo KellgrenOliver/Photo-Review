@@ -10,9 +10,6 @@ const Container = styled.div({
   alignItems: "center",
   flexDirection: "column",
   textAlign: "center",
-  "@media screen and (min-width: 600px)": {
-    marginTop: "25vh",
-  },
 });
 const Input = styled.input({
   backgroundColor: "#dedede",
@@ -69,14 +66,18 @@ const SignupPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // If password and confirm password not matches
     if (passwordRef.current.value !== passwordConfirmRef.current.value) {
       return setError("The passwords does not match");
     }
     setError(null);
 
     try {
+      // Gives signup function email and password
       await signup(emailRef.current.value, passwordRef.current.value);
+      // Navigates to homepage
       navigate("/");
+      // Catches error and sets message to error message
     } catch (e) {
       setError(e.message);
     }

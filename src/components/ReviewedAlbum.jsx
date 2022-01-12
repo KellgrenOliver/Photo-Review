@@ -60,10 +60,12 @@ const CloseX = styled.div({
 });
 
 const ReviewedAlbum = () => {
+  // Gets the loged in user
   const { currentUser } = useAuthContext();
   const [highlightImage, setHighlightImage] = useState("");
   const params = useParams();
 
+  // Reference to db
   const queryRef = query(
     collection(db, "albums"),
     where("owner", "==", currentUser.uid),
@@ -71,11 +73,13 @@ const ReviewedAlbum = () => {
     where("album", "==", params.id)
   );
 
+  // Gets data from the referance
   const { data } = useFirestoreQueryData(["albums"], queryRef);
 
   return (
     <>
       <ImageContainer>
+        {/* Maping out iamges */}
         {data &&
           data[0].images.map((photo) => (
             <Img
@@ -86,6 +90,7 @@ const ReviewedAlbum = () => {
             />
           ))}
       </ImageContainer>
+      {/* Show big image */}
       {highlightImage.length > 0 && (
         <HighlightImageWrapper highlightImage={highlightImage}>
           <CloseX onClick={() => setHighlightImage("")}>X</CloseX>

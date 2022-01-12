@@ -97,8 +97,9 @@ const UploadAlbum = () => {
       return;
     }
 
+    // Map albums
     const albums = data && data.map((item) => item.album);
-
+    // If the album name already exists
     if (albums.includes(albumName)) {
       setMessage({
         type: "warning",
@@ -107,8 +108,10 @@ const UploadAlbum = () => {
       return;
     }
 
+    // Array of the selected images
     const uploadImages = [];
 
+    // Looping through images
     for (let i = 0; i < images.length; i++) {
       let image = images[i];
       const uuid = uuidv4();
@@ -136,7 +139,6 @@ const UploadAlbum = () => {
           });
         },
         async () => {
-          // get download url to uploaded file
           const url = await getDownloadURL(fileRef);
 
           uploadImages.push({

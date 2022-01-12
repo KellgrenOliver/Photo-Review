@@ -15,7 +15,7 @@ const LoadingWrapper = styled.div({
 const LogOutPage = () => {
   const navigate = useNavigate();
   const { signout } = useAuthContext();
-
+  // UseEffect that runs signout function directly when going to this page and navigates to homepage
   useEffect(() => {
     signout();
     navigate("/");

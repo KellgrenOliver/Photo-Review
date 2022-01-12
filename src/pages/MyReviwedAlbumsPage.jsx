@@ -27,6 +27,7 @@ const MyReviwedAlbumsPage = () => {
   return (
     <div>
       <Header title={"REVIEWED ALBUMS"} />
+      {/* If there is data it maps out data otherwise it will render a text that says you dont have any reviewed albums */}
       {data && data.length > 0 ? (
         <>
           <ReviewedAlbums />

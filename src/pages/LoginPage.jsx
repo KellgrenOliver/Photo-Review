@@ -6,9 +6,6 @@ import Header from "../components/Header";
 
 const Container = styled.div({
   textAlign: "center",
-  "@media screen and (min-width: 600px)": {
-    marginTop: "25vh",
-  },
 });
 const Wrapper = styled.div({
   display: "flex",
@@ -58,9 +55,12 @@ const SignUpLink = styled(Link)({
 });
 
 const LoginPage = () => {
+  // Ref to email
   const emailRef = useRef();
+  // Ref to password
   const passwordRef = useRef();
   const [error, setError] = useState(null);
+  // Login function from user context
   const { login } = useAuthContext();
   const navigate = useNavigate();
 
@@ -68,8 +68,11 @@ const LoginPage = () => {
     e.preventDefault();
     setError(null);
     try {
+      // Gives login function email and password
       await login(emailRef.current.value, passwordRef.current.value);
+      // Navigates to homepage
       navigate("/");
+      // Catches error and sets message to error message
     } catch (e) {
       setError(e.message);
     }

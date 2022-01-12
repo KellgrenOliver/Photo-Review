@@ -43,6 +43,7 @@ const ReviewedAlbums = () => {
     <Container>
       {data &&
         data.map((album) => (
+          // When clicking on a album you gets navigated to the album
           <Album key={album.albumId} onClick={() => navigate(album.album)}>
             {album.album.toUpperCase()}
           </Album>

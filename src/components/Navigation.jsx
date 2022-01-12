@@ -44,9 +44,11 @@ const StyledLink = styled(Link)({
 });
 
 const Navigation = () => {
+  // Gets current user from context
   const { currentUser } = useAuthContext();
 
   return (
+    // Bootstrap navbar
     <Navbar bg="dark" variant="dark" expand="md" className="fixed-top">
       <Container>
         <Link to="/" className="navbar-brand">
@@ -58,6 +60,7 @@ const Navigation = () => {
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto">
+            {/* If there is a user logged in it will render upload album etc, otherwise log in and sign up */}
             {currentUser ? (
               <>
                 <StyledLink to="/myprofile">
