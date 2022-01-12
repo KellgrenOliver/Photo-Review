@@ -272,7 +272,7 @@ const AlbumPage = () => {
     }
   };
 
-  const link = `www.localhost:3000/reviewalbum/${params.id}`;
+  const link = `www.olivernaturephotos.netlify.app/reviewalbum/${params.id}`;
   // Copy function
   const copy = async () => {
     await navigator.clipboard.writeText(link);
